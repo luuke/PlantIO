@@ -1,0 +1,151 @@
+dofile("credentials.lua")
+
+-- ***** MQTT *****
+-- init mqtt client with logins, keepalive timer 120sec
+mqttClient = mqtt.Client("clientid", 120, MQTT.Login, MQTT.Password)
+mqttClient:on("connect", function(client) print ("onConnected") end)
+mqttClient:on("offline", function(client) print ("MQTT offline") end)
+mqttClient:on("message", function(client, topic, data) 
+    print(topic .. ":" ) 
+    if data ~= nil then
+        print(data)
+    end
+end)
+
+function MQTT_Connect()
+    mqttClient:connect(MQTT.Address, MQTT.Port, 0, 
+        function(client)
+            print("MQTT connected")
+            MQTT_Publish(SoilMoisture)
+        end,
+        function(client, reason)
+            print("MQTT connection failed - reason: " .. reason)
+            -- Something has gone wrong with connection
+            -- No worries, go sleep and try again next time
+            Sleep()
+        end
+        )    
+end
+
+function MQTT_Publish(data)
+    print("Sending data...")
+    mqttClient:publish("plant/moisture", SoilMoisture, 0, 0, 
+        function(client) 
+            print("   Moisture sent") 
+            Sleep()
+        end 
+        )
+end
+
+-- ***** WIFI *****
+function WIFI_Setup()
+    wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, 
+        function()
+            print("WIFI connected")
+            print("Conneting to MQTT broker...")
+            MQTT_Connect()
+        end
+        )
+    wifi.setmode(wifi.STATION)
+    wifiConfig = {}
+    wifiConfig.ssid = Network.SSID
+    wifiConfig.pwd = Network.Password
+    wifi.sta.config(wifiConfig)
+end
+
+-- ***** Moisture sensor *****
+function MoistureSensor_Enable()
+    gpio.write(outMoistureSensor, gpio.HIGH) 
+end
+
+function MoistureSensor_Disable()
+    gpio.write(outMoistureSensor, gpio.LOW) 
+end
+
+function MoistureSensor_Read()
+    return adc.read(0)
+end
+
+-- ***** Water pump *****
+function WaterPump_On()
+    gpio.write(outWaterPump, gpio.HIGH) 
+end
+
+function WaterPump_Off()
+    gpio.write(outWaterPump, gpio.LOW)
+end
+
+function WaterPump_WaterThePlant()
+    print("Watering...")
+    
+    wateringTime = 5000 -- [ms]
+    WaterPump_On()
+    waterTimer = tmr.create()
+    waterTimer:alarm(wateringTime, tmr.ALARM_SINGLE, 
+        function()    
+            print("Watering done")
+            WaterPump_Off()
+            WateringDone = 1
+        end
+        )
+--    repeat
+--        tmr.wdclr()
+--    until(WateringDone == 1)
+--    print("Watering done")
+--    WaterPump_Off()
+end
+
+-- ***** Utils *****
+function Delay(ms)
+    startTick = tmr.now()
+    repeat
+        -- Do nothing, this is just delay
+    until ( (tmr.now() - startTick) > ( ms * 1000 ) )
+end
+
+function Sleep()
+    print("Going to sleep for " .. (AppInterval / 1000000) .. " seconds")
+    gpio.write(outLED, gpio.HIGH) 
+    node.dsleep(AppInterval) 
+end
+    
+-- ***** GPIO *****
+outLED = 4
+outMoistureSensor = 7
+outWaterPump = 8
+gpio.mode(outLED, gpio.OUTPUT)
+gpio.mode(outMoistureSensor, gpio.OUTPUT)
+gpio.mode(outWaterPump, gpio.OUTPUT)
+
+-- ***** App *****
+AppInterval = 300000000 -- 5 minutes
+gpio.write(outLED, gpio.LOW) 
+
+MoistureSensor_Enable()
+Delay(500) -- delay for sensor to stabilize
+SoilMoisture = MoistureSensor_Read()
+print("Soil moisture: " .. SoilMoisture)
+MoistureSensor_Disable()
+
+if SoilMoisture > 700 then 
+    WateringDone = 0
+    WaterPump_WaterThePlant()
+else
+    WateringDone = 1
+end
+
+waitTimer = tmr.create()
+waitTimer:alarm(1000, tmr.ALARM_AUTO, 
+    function()
+        if WateringDone == 1 then
+            waitTimer:stop()
+            print("Opening WIFI connection...")
+            WIFI_Setup()
+        else
+            -- Just wait
+            print(".")
+        end
+    end
+    )
+
+

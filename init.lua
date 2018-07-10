@@ -66,6 +66,34 @@ function MoistureSensor_Read()
     return adc.read(0)
 end
 
+-- ***** Temperature sensor *****
+TemperatureSensorAddress = "28:87:19:43:98:24:00:61"
+function TemperatureSensor_Enable()
+
+end
+
+function TemperatureSensor_Disable()
+
+end
+
+function TemperatureSensor_Setup()
+    ds18b20.setting({TemperatureSensorAddress}, 12)
+end
+
+function TemperatureSensor_Read()
+    SoilTemperatureReady = 0
+    ds18b20.read(
+        TemperatureSensor_ReadCallback,
+        {TemperatureSensorAddress}
+        );
+end
+
+function TemperatureSensor_ReadCallback(ind,rom,res,temp,tdec,par)
+    SoilTemperatureReady = 1
+    SoilTemperature = temp .. "." .. tdec
+    print("SoilTemperature: " .. SoilTemperature)
+end
+
 -- ***** Water pump *****
 function WaterPump_On()
     gpio.write(outWaterPump, gpio.HIGH) 
@@ -117,6 +145,7 @@ outWaterPump = 8
 gpio.mode(outLED, gpio.OUTPUT)
 gpio.mode(outMoistureSensor, gpio.OUTPUT)
 gpio.mode(outWaterPump, gpio.OUTPUT)
+ds18b20.setup(outTemperatureSensor)
 
 -- ***** App *****
 AppInterval = 300000000 -- 5 minutes
@@ -127,6 +156,12 @@ Delay(500) -- delay for sensor to stabilize
 SoilMoisture = MoistureSensor_Read()
 print("Soil moisture: " .. SoilMoisture)
 MoistureSensor_Disable()
+
+TemperatureSensor_Enable()
+TemperatureSensor_Setup()
+Delay(500) -- delay for sensor to stabilize
+TemperatureSensor_Read() -- trigger reading wait for callback
+TemperatureSensor_Disable()
 
 if SoilMoisture > 700 then 
     WateringDone = 0

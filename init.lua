@@ -151,6 +151,8 @@ ds18b20.setup(outTemperatureSensor)
 AppInterval = 300000000 -- 5 minutes
 gpio.write(outLED, gpio.LOW) 
 
+print("----- PlantIO -----")
+
 MoistureSensor_Enable()
 Delay(500) -- delay for sensor to stabilize
 SoilMoisture = MoistureSensor_Read()

@@ -16,7 +16,8 @@ function MQTT_Connect()
     mqttClient:connect(MQTT.Address, MQTT.Port, 0, 
         function(client)
             print("MQTT connected")
-            MQTT_Publish(SoilMoisture)
+            MQTT_Publish(SoilMoisture, "plantio/moisture")
+            MQTT_Publish(SoilTemperature,"plantio/temperature")
         end,
         function(client, reason)
             print("MQTT connection failed - reason: " .. reason)

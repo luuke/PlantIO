@@ -178,11 +178,13 @@ else
     WateringDone = 1
 end
 
-waitTimer = tmr.create()
-waitTimer:alarm(1000, tmr.ALARM_AUTO, 
+DataSent = 0
+
+sensorsReadWaitTimer = tmr.create()
+sensorsReadWaitTimer:alarm(1000, tmr.ALARM_AUTO, 
     function()
         if WateringDone == 1 and SoilTemperatureReady == 1 then
-            waitTimer:stop()
+            sensorsReadWaitTimer:stop()
             print("Opening WIFI connection...")
             WIFI_Setup()
         else

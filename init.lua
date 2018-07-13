@@ -100,6 +100,7 @@ end
 
 function TemperatureSensor_ReadCallback(ind,rom,res,temp,tdec,par)
     SoilTemperatureReady = 1
+    Sensors_Disable()
     SoilTemperature = temp .. "." .. tdec
     print("SoilTemperature: " .. SoilTemperature)
 end
@@ -171,7 +172,7 @@ print("Soil moisture: " .. SoilMoisture)
 TemperatureSensor_Setup()
 Delay(500) -- delay for sensor to stabilize
 TemperatureSensor_Read() -- trigger reading wait for callback
-Sensors_Disable()
+-- Sensors are disabled in temperature sensor read callback
 
 if SoilMoisture > 700 then 
     WateringDone = 0

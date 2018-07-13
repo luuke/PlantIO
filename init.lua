@@ -27,9 +27,9 @@ function MQTT_Connect()
         )    
 end
 
-function MQTT_Publish(data)
+function MQTT_Publish(data, topic)
     print("Sending data...")
-    mqttClient:publish("plantio/moisture", data, 0, 0, 
+    mqttClient:publish(topic, data, 0, 0, 
         function(client) 
             print("   Moisture sent") 
             Sleep()

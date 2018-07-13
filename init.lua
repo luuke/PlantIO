@@ -53,6 +53,16 @@ function WIFI_Setup()
     wifi.sta.config(wifiConfig)
 end
 
+-- ***** Sensors (common) *****
+function Sensors_Enable()
+    MoistureSensor_Enable()
+    TemperatureSensors_Enable()
+end
+
+function Sensors_Disable()
+    MoistureSensor_Disable()
+    TemperatureSensor_Disable()
+
 -- ***** Moisture sensor *****
 function MoistureSensor_Enable()
     gpio.write(outMoistureSensor, gpio.HIGH) 
@@ -69,11 +79,11 @@ end
 -- ***** Temperature sensor *****
 TemperatureSensorAddress = "28:87:19:43:98:24:00:61"
 function TemperatureSensor_Enable()
-
+    -- So far this is covered together with moisture sensor
 end
 
 function TemperatureSensor_Disable()
-
+    -- So far this is covered together with moisture sensor
 end
 
 function TemperatureSensor_Setup()
@@ -153,17 +163,15 @@ gpio.write(outLED, gpio.LOW)
 
 print("----- PlantIO -----")
 
-MoistureSensor_Enable()
+Sensors_Enable()
 Delay(500) -- delay for sensor to stabilize
 SoilMoisture = MoistureSensor_Read()
 print("Soil moisture: " .. SoilMoisture)
-MoistureSensor_Disable()
 
-TemperatureSensor_Enable()
 TemperatureSensor_Setup()
 Delay(500) -- delay for sensor to stabilize
 TemperatureSensor_Read() -- trigger reading wait for callback
-TemperatureSensor_Disable()
+Sensors_Disable()
 
 if SoilMoisture > 700 then 
     WateringDone = 0

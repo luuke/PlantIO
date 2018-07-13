@@ -104,7 +104,7 @@ function TemperatureSensor_ReadCallback(ind,rom,res,temp,tdec,par)
     SoilTemperatureReady = 1
     Sensors_Disable()
     SoilTemperature = temp .. "." .. tdec
-    print("SoilTemperature: " .. SoilTemperature)
+    print("Soil temperature: " .. SoilTemperature)
 end
 
 -- ***** Water pump *****

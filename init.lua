@@ -16,8 +16,15 @@ function MQTT_Connect()
     mqttClient:connect(MQTT.Address, MQTT.Port, 0, 
         function(client)
             print("MQTT connected")
-            MQTT_Publish(SoilMoisture, "plantio/moisture")
-            MQTT_Publish(SoilTemperature,"plantio/temperature")
+            MQTT_Publish(SoilMoisture, "plantio/moisture", 
+                function()
+                    MQTT_Publish(SoilTemperature,"plantio/temperature", 
+                    function()
+                        DataSent = 1
+                    end
+                    )  
+                end
+                )    
         end,
         function(client, reason)
             print("MQTT connection failed - reason: " .. reason)
@@ -28,9 +35,9 @@ function MQTT_Connect()
         )    
 end
 
-function MQTT_Publish(data, topic)
+function MQTT_Publish(data, topic, callback)
     print("Sending data...")
-    mqttClient:publish(topic, data, 0, 0, nil)
+    mqttClient:publish(topic, data, 0, 0, callback)
 end
 
 -- ***** WIFI *****

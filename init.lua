@@ -185,11 +185,3 @@ waitTimer:alarm(1000, tmr.ALARM_AUTO,
         end
     end
     )
-ds18b20.setup(outTemperatureSensor)
-ds18b20.setting({"28:87:19:43:98:24:00:61"}, 12)
-ds18b20.read(
-    function(ind,rom,res,temp,tdec,par)
-        print(ind,string.format("%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",string.match(rom,"(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")),res,temp,tdec,par)
-    end,{"28:87:19:43:98:24:00:61"});
-
-

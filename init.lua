@@ -29,7 +29,7 @@ end
 
 function MQTT_Publish(data)
     print("Sending data...")
-    mqttClient:publish("plant/moisture", SoilMoisture, 0, 0, 
+    mqttClient:publish("plantio/moisture", SoilMoisture, 0, 0, 
         function(client) 
             print("   Moisture sent") 
             Sleep()

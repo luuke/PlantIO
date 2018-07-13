@@ -30,12 +30,7 @@ end
 
 function MQTT_Publish(data, topic)
     print("Sending data...")
-    mqttClient:publish(topic, data, 0, 0, 
-        function(client) 
-            print("   Moisture sent") 
-            Sleep()
-        end 
-        )
+    mqttClient:publish(topic, data, 0, 0, nil)
 end
 
 -- ***** WIFI *****

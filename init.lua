@@ -193,3 +193,16 @@ sensorsReadWaitTimer:alarm(1000, tmr.ALARM_AUTO,
         end
     end
     )
+
+dataSentWaitTimer = tmr.create()
+dataSentWaitTimer:alarm(1000, tmr.ALARM_AUTO, 
+    function()
+        if DataSent == 1 then
+            dataSentWaitTimer:stop()
+            Sleep()
+        else
+            -- Just wait
+            print(":")
+        end
+    end
+    )

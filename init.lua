@@ -56,12 +56,13 @@ end
 -- ***** Sensors (common) *****
 function Sensors_Enable()
     MoistureSensor_Enable()
-    TemperatureSensors_Enable()
+    TemperatureSensor_Enable()
 end
 
 function Sensors_Disable()
     MoistureSensor_Disable()
     TemperatureSensor_Disable()
+end
 
 -- ***** Moisture sensor *****
 function MoistureSensor_Enable()

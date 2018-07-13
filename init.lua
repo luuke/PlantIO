@@ -131,11 +131,6 @@ function WaterPump_WaterThePlant()
             WateringDone = 1
         end
         )
---    repeat
---        tmr.wdclr()
---    until(WateringDone == 1)
---    print("Watering done")
---    WaterPump_Off()
 end
 
 -- ***** Utils *****
@@ -167,7 +162,6 @@ AppInterval = 300000000 -- 5 minutes
 gpio.write(outLED, gpio.LOW) 
 
 print("----- PlantIO -----")
-
 Sensors_Enable()
 Delay(500) -- delay for sensor to stabilize
 SoilMoisture = MoistureSensor_Read()
